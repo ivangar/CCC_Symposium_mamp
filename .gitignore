@@ -1,0 +1,14 @@
+# Ignore media files #
+*.mp4
+*.pdf
+*.jpg
+*.JPG
+*.jpeg
+*.png
+*.gif
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+*.doc
+*.docx
