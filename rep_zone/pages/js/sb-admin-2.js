@@ -20,10 +20,17 @@ $(function() {
 
         height = ((this.window.innerHeight > 0) ? this.window.innerHeight : this.screen.height) - 1;
         height = height - topOffset;
+        console.log("the height is ",height)
         if (height < 1) height = 1;
         if (height > topOffset) {
-            $("#page-wrapper").css("min-height", "783px"); //(height) + "px");
+            if(height < 783){
+                $("#page-wrapper").css("min-height", "783px"); //(height) + "px");
+            }
+            else{
+                $("#page-wrapper").css("min-height", (height) + "px");
+            }
         }
+
     });
 
     var url = window.location;
