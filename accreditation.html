@@ -1,0 +1,84 @@
+<script type="text/javascript">
+    /*$.noConflict();*/
+    $(document).ready(function () {
+      var programId = <?php if(isset($program_id)) {echo " '$program_id' ";} else echo ''; ?>;  //program Id
+      var user = <?php if(isset($_SESSION['user_id'])) {echo $_SESSION['user_id']; } else echo 0; ?>;
+
+      /*
+      $( "#certificate" ).click(function() {
+        window.open('https://www.dxlink.ca/tcpdf/accreditation/create_certificate_spc.php?program=' + programId + '&user=' + user,'_blank','toolbar=0,width=1150px,height=735px,menubar=no,location=yes,resizable=yes,scrollbars=yes,status=no');
+      });
+      */
+  });//end document.ready
+</script>
+<div class="innerContentFrame">
+   <table style="width:100%;" >
+      <tr valign="top">
+        <td style="vertical-align:top;padding: 0; width:690px" >
+<form class="jotform-form" action="" method="post" name="AIT-program-accreditation" id="AIT-program-accreditation" accept-charset="utf-8">
+  <div class="program_evaluation" style="width:620px;">
+    <ul class="form-section">
+      <li class="form-line accreditation-form" >
+        <div  style="margin:0;">
+          <div class="form-html " style="padding:0;">
+            <h2>
+              Innovating, Optimizing, and Advancing<br>Antithrombotic Treatment in Atrial Fibrillation
+            </h2>
+             <h2>Accreditation Criteria:</h2>
+             <h3>
+              For accreditation purposes and to be issued a certificate of participation, you must successfully complete each of the elements listed below.
+           </h3>
+            <h3>
+              Following completion of all of these elements, you will be provided with a link where you will be able to request your certificate. 
+            </h3>
+          </div>
+          <hr />
+        </div>
+      </li>
+      <li class="form-line accreditation-form" >
+        <div id="header_prog_evaluation">
+          <div class="form-header-group cert_label">
+          <h3>Royal College MOC</h3> 
+        </div>
+      </div>
+      </li>
+      <li class="form-line accreditation-form" id="id_2matrix">
+        <div id="cid_accrediation" >
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table status_table">
+            <tr>
+              <th style="border:none" >
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers title-row">
+                Discussion Forum
+              </th>
+              <th class="form-matrix-column-headers title-row">
+                Program Evaluation
+              </th>
+            </tr>
+            <tr>
+              <th align="center" class="form-matrix-row-headers" style="width:140px;">
+                Completion Status
+              </th>
+              <td align="center" class="form-matrix-values" style="width:130px;">
+                <input class="form-checkbox" type="checkbox" name="q1_clickTo[0]" <?php if( isset($sections_status['forum']) && $sections_status['forum'] ) echo 'checked';?> disabled />
+              </td>
+              <td align="center" class="form-matrix-values" style="width:130px;">
+                <input class="form-checkbox" type="checkbox" name="q1_clickTo[0]" <?php if( isset($sections_status['evaluation']) && $sections_status['evaluation'] ) echo 'checked';?> disabled  />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </li>
+      <li id="eval_actions">
+          <div style="padding:0 10px 0 0;">
+              <?php if($program_completed) { echo "<a href='http://ccs.ca/en/professional-development/certificates-of-attendance' style='font-size: 15px;color: #1477bb;cursor: pointer;font-weight: bold;margin: 0;padding: 0;' target='_blank' >Get your certificate</a>"; }?>
+          </div>
+      </li>
+    </ul>
+  </div>
+</form>
+  </td>
+    </tr>
+    </table>
+</div>

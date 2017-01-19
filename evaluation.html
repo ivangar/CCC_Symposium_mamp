@@ -1,0 +1,375 @@
+<script type="text/javascript">
+    /*$.noConflict();*/
+    $(document).ready(function () {
+
+      var evaluationId = <?php if(isset($evaluation_id)) {echo " '$evaluation_id' ";} else echo ''; ?>;  //replace all section ids in the code
+      var no_questions = 6;
+
+      $( "#prev_post_test_section, #next_accreditation_section" ).click(function() {
+          target = $(this).attr( "alt" );
+          window.parent.showTab(target);
+      });
+       
+      $( "#CCC-program-evaluation" ).submit(function( event ) {
+
+          // customize Parsley errors class to append the errorwraper ul inside the container div specified
+          $( '#CCC-program-evaluation' ).parsley( {
+              errors: {
+                  container: function (element, isRadioOrCheckbox) {
+                      var $container = element.parent().find(".parsley-container");
+                      if ($container.length === 0) {
+                          $container = $("<div class='parsley-container eval'></div>").insertBefore(element);
+                      }
+                      return $container;
+                  }
+              }
+          } );
+
+          //since the form is submitted using jQuery event, bind the form with Parsley.
+          var form_valid = $( '#CCC-program-evaluation' ).parsley( 'validate' );
+
+          //prevent form submission if parsley returns false
+          if ( !form_valid )
+          {
+              event.preventDefault();
+          }
+
+          //Gather all data and process after Parsley validations return success
+          else{
+
+              $( '#CCC-program-evaluation' ).parsley( 'destroy' );
+              
+              //Get all choice letters submitted (1, 2, 3, etc.)
+              var choices = new Object();
+
+              $('input[type="radio"]:checked').each(function() {
+                  var choice = (this.id).slice(-1);
+                  var question_id = this.name;
+                  choices[question_id]=choice;
+              });
+               
+              question_answer = $("#CCC-program-evaluation").serializeArray();
+               
+              evaluation_submitted = { "no_qs": no_questions, "qas":question_answer, "choices":choices, "program_section": evaluationId};
+              target = "resources/process_evaluation.php";
+
+              $.ajax({
+                  url: target,
+                  cache: false,
+                  type: "POST",
+                  dataType: "html",
+                  data: evaluation_submitted
+                }) 
+
+              .done(function( data ) {
+                  if (data === "failed"){
+                        $( ".parsley-container.evaluation" ).html( "<ul style='width: 673px;'> <li>To submit the evaluation you must select one choice for every question and at least 1 option from the check box question.</li></ul>" );
+                        $( ".parsley-container.evaluation" ).show();
+                        $("html, body").animate({
+                          scrollTop: 0
+                        }, 500);     
+                  }
+
+                  if (data === "completed"){
+                      document.location.reload(true); //reload page in order to update access to post-test form
+                  }
+                  
+              })
+              .fail(function() {
+                    $( ".parsley-container.evaluation" ).html( "<ul style='width: 673px;'> <li>We are sorry, the questions were not submitted. Try again. </li></ul>" );
+                    $( ".parsley-container.evaluation" ).show();
+                        $("html, body").animate({
+                          scrollTop: 0
+                        }, 500);     
+              }); //ajax call
+
+          }//end else
+          
+          event.preventDefault();
+
+      }); //click function   
+
+  });//end document.ready
+</script>
+<table border="0" cellspacing="0">
+<tr valign="top">
+<td style="padding:0;width:685px;">
+<?php if( isset($sections_status['evaluation']) && $sections_status['evaluation'] ) { ?>  
+<div class="program_eval" style="padding:5px 0 0 10px;">
+    <h2>
+    Innovating, Optimizing, and Advancing<br>Antithrombotic Treatment in Atrial Fibrillation
+    </h2>
+    <h2>Program Evaluation:
+    </h2>
+    <h3>
+    Thank you for evaluating this program.
+    </h3>
+</div>
+<?php } else { ?>
+<form class="jotform-form" action="" method="post" data-ajax="false" name="CCC-program-evaluation" id="CCC-program-evaluation" accept-charset="utf-8">
+  <div class="program_eval" style="width:685px;">
+    <ul class="form-section">
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:10px;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+              <h2>
+              Innovating, Optimizing, and Advancing<br>Antithrombotic Treatment in Atrial Fibrillation
+            </h2>
+             <h2>Program Evaluation:</h2>
+             <h3>
+             Please indicate the degree to which you agree with the statements below, using the following scale:
+            </h3>
+            <h3>1 = strongly disagree; 2 = disagree; 3 = neutral; 4 = agree; 5 = strongly agree.
+            </h3>
+          </div>
+          <hr />
+        </div>
+        <div class="parsley-container evaluation backend" style="display:none;width: 678px;"> </div>
+      </li>
+      <li class="form-line-custom" >
+        <div id="header_prog_evaluation">
+          <div class="form-header-group wide_label">
+          <label class="form-label-top eval_label"> The Program </label>
+        </div>
+      </div>
+      </li>
+      <li class="form-line-custom" id="id_1matrix">
+        <div id="cid_evaluation" class="form-input-wider">
+          <div class="form-single-column">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none">
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_0">
+                1
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_1">
+                2
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_2">
+                3
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_3">
+                4
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_4">
+                5
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                This program content enhanced my knowledge
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_1" name="AIT_E_13" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_2" name="AIT_E_13" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_3" name="AIT_E_13" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_4" name="AIT_E_13" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_5" name="AIT_E_13" value="Strongly Agree" />
+              </td>
+            </tr>            
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                The program was relevant to my practice
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_2_eval_1" name="AIT_E_1" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_2_eval_2" name="AIT_E_1" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_2_eval_3" name="AIT_E_1" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_2_eval_4" name="AIT_E_1" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_2_eval_5" name="AIT_E_1" value="Strongly Agree" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                The program met the stated learning objectives
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_1" name="AIT_E_2" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_2" name="AIT_E_2" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_3" name="AIT_E_2" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_4" name="AIT_E_2" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_5"  name="AIT_E_2" value="Strongly Agree" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                The format was effective
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_4_eval_1" name="AIT_E_3" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_4_eval_2" name="AIT_E_3" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_4_eval_3" name="AIT_E_3" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_4_eval_4" name="AIT_E_3" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_4_eval_5" name="AIT_E_3" value="Strongly Agree" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                The program was unbiased and balanced
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_5_eval_1" name="AIT_E_4" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_2" name="AIT_E_4" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_3" name="AIT_E_4" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_4" name="AIT_E_4" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_5" name="AIT_E_4" value="Strongly Agree" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                This activity will impact my practice
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_1" name="AIT_E_5" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_2" name="AIT_E_5" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_3" name="AIT_E_5" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_4" name="AIT_E_5" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_5" name="AIT_E_5" value="Strongly Agree" />
+              </td>
+            </tr>
+          </table>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" >
+        <div id="text">
+          <div class="form-header-group wide_label">
+            <label class="form-label-top eval_label"> Please answer the following questions. </label>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_2" >
+        <div id="cid_2_Evaluation" class="form-input-wide">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none" >
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers title-row">
+               Yes
+              </th>
+              <th class="form-matrix-column-headers title-row">
+                No
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                1. Did you perceive any degree of bias in any part of the program?
+              </th>
+              <td align="center" class="form-matrix-values pretest-col">
+                <input class="form-checkbox" type="checkbox" name="AIT_E_15" id="bias_yes" value="yes" />
+              </td>
+              <td align="center" class="form-matrix-values pretest-col">
+                <input class="form-checkbox" type="checkbox" name="AIT_E_15" id="bias_no" value="no" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_3">
+        <label class="form-label-top eval_label" for="eval_q_3"> If so, please explain. </label>
+        <div id="cid_3_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_3" class="form-textarea" parsley-error-message="Maximum number of characters allowed: 500" parsley-maxlength="500"  name="bias" rows="3"></textarea>
+                <div class="eval_q_3 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_4">
+        <label class="form-label-top eval_label" for="eval_q_4"> 2. Describe two positive features of this program </label>
+        <div id="cid_4_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_4" class="form-textarea" parsley-error-message="Maximum number of characters allowed: 500" parsley-maxlength="500"  name="AIT_E_7" rows="3"></textarea>
+                 <div class="eval_q_4 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_5">
+        <label class="form-label-top eval_label" for="eval_q_5"> 3. Would you change anything about the program? If so, please explain. </label>
+        <div id="cid_5_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_5" class="form-textarea" parsley-error-message="Maximum number of characters allowed: 500" parsley-maxlength="500"  name="AIT_E_8" rows="3"></textarea>
+                <div class="eval_q_5 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_6">
+        <label class="form-label-top eval_label" for="eval_q_6"> 4. What did you learn from this program that you plan to use in your practice? </label>
+        <div id="cid_6_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_6" class="form-textarea" parsley-error-message="Maximum number of characters allowed: 500" parsley-maxlength="500" name="AIT_E_9" rows="3" ></textarea>
+                <div class="eval_q_6 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_7">
+        <label class="form-label-top eval_label" for="eval_q_7"> 5. Are there any related topics that the program should cover? </label>
+        <div id="cid_7_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_7" class="form-textarea" parsley-error-message="Maximum number of characters allowed: 500" parsley-maxlength="500" name="AIT_E_10" rows="3" ></textarea>
+                <div class="eval_q_7 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_8">
+        <label class="form-label-top eval_label" for="eval_q_8"> 6. General comments and suggestions: </label>
+        <div id="cid_8_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_8" class="form-textarea" parsley-error-message="Maximum number of characters allowed: 500" parsley-maxlength="500" name="AIT_E_12" rows="3" ></textarea>
+                <div class="eval_q_8 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li id="eval_actions">
+        <div id="cid_eval_actions" >
+          <div style="padding:0 10px 0 10px;" class="form-buttons-wrapper">
+            <button id="submit_evaluation" type="submit" class="big-form-button">Submit</button>
+            <button id="reset_eval_form" type="reset" class="form-submit-reset big-form-button">Clear Form</button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</form>
+<?php }//Close else tag ?>
+</td>
+  </tr>
+</table>

@@ -1,0 +1,62 @@
+#v-nav >div.tab-content
+{
+    min-height: 700px;
+}
+
+#v-nav > ul > li#custom
+{
+    background: #a5be2c linear-gradient(#a5be2c, #dddddd) repeat-x scroll 0 0;
+}
+
+#v-nav > ul > li#custom:hover
+{
+    background: #a5be2c;
+}
+
+#v-nav > ul > li#custom .current
+{
+    background: #a5be2c;
+}
+
+#id_1matrix, #id_2matrix, .wide_label{
+	width: 678px;
+}
+
+.wide_label{
+    width: 662px;
+}
+
+.form-input-wider {
+    margin-bottom: 10px;
+    width: 678px;
+}
+
+.form-input-wider .form-textarea{
+    width: 678px;
+    max-width: 678px;
+}
+
+.form-line-custom {
+    box-sizing: border-box;
+    margin: 5px 0;
+    padding: 5px 0;
+    width: 99%;
+}
+
+.form-matrix-table-wide {
+    border-collapse: collapse;
+    margin-bottom: 5px;
+    width: 678px;
+}
+
+.form-matrix-row-headers.wide{
+    width: 370px;
+}
+
+.parsley-container.eval ul {
+    width: 675px;
+}
+
+.accred_reqs.unlinked{
+     cursor: default;
+}

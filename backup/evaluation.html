@@ -1,0 +1,780 @@
+<script type="text/javascript">
+    /*$.noConflict();*/
+    $(document).ready(function () {
+
+      var evaluationId = <?php if(isset($evaluation_id)) {echo " '$evaluation_id' ";} else echo ''; ?>;  //replace all section ids in the code
+      var no_questions = 18;
+       
+      $( "#CCC-program-evaluation" ).submit(function( event ) {
+
+          // customize Parsley errors class to append the errorwraper ul inside the container div specified
+          $( '#CCC-program-evaluation' ).parsley( {
+              errors: {
+                  container: function (element, isRadioOrCheckbox) {
+                      var $container = element.parent().find(".parsley-container");
+                      if ($container.length === 0) {
+                          $container = $("<div class='parsley-container eval' style='width: 678px;'></div>").insertBefore(element);
+                      }
+                      return $container;
+                  }
+              }
+          } );
+
+          //since the form is submitted using jQuery event, bind the form with Parsley.
+          var form_valid = $( '#CCC-program-evaluation' ).parsley( 'validate' );
+
+          //prevent form submission if parsley returns false
+          if ( !form_valid )
+          {
+              event.preventDefault();
+          }
+
+          //Gather all data and process after Parsley validations return success
+          else{
+
+              $( '#CCC-program-evaluation' ).parsley( 'destroy' );
+              
+              //Get all choice letters submitted (1, 2, 3, etc.)
+              var choices = new Object();
+
+              $('input[type="radio"]:checked').each(function() {
+                  var choice = (this.id).slice(-1);
+                  var question_id = this.name;
+                  choices[question_id]=choice;
+              });
+               
+              question_answer = $("#CCC-program-evaluation").serializeArray();
+               
+              evaluation_submitted = { "no_qs": no_questions, "qas":question_answer, "choices":choices, "program_section": evaluationId}; 
+              target = "resources/process_evaluation.php";
+              console.log(evaluation_submitted);
+
+              $.ajax({
+                  url: target,
+                  cache: false,
+                  type: "POST",
+                  dataType: "html",
+                  data: evaluation_submitted
+                }) 
+
+              .done(function( data ) {
+                  if (data === "failed"){
+                        $( ".parsley-container.evaluation" ).html( "<ul style='width: 673px;'> <li style='width: 663px;'>To submit the evaluation you must answer all the questions.</li></ul>" );
+                        $( ".parsley-container.evaluation" ).show();
+                        $("html, body").animate({
+                          scrollTop: 0
+                        }, 500);     
+                  }
+
+                  if (data === "completed"){
+                      document.location.reload(true); //reload page in order to update access to post-test form
+                  }
+                  
+              })
+              .fail(function() {
+                    $( ".parsley-container.evaluation" ).html( "<ul style='width: 673px;'> <li>We are sorry, the questions were not submitted. Try again. </li></ul>" );
+                    $( ".parsley-container.evaluation" ).show();
+                        $("html, body").animate({
+                          scrollTop: 0
+                        }, 500);     
+              }); //ajax call
+
+          }//end else
+          
+          event.preventDefault();
+
+      }); //click function   
+
+  });//end document.ready
+</script>
+<table border="0" cellspacing="0">
+<tr valign="top">
+<td style="padding:0;width:685px;">
+<?php if( isset($sections_status['evaluation']) && $sections_status['evaluation'] ) { ?>  
+<div class="program_eval" style="padding:5px 0 0 10px;">
+    <h2>
+    Innovating, Optimizing, and Advancing<br>Antithrombotic Treatment in Atrial Fibrillation
+    </h2>
+    <h2>Program Evaluation:
+    </h2>
+    <h3>
+    Thank you for evaluating this program.
+    </h3>
+</div>
+<?php } else { ?>
+<!-- TEMPORARY NOTIFICATION, REMOVE FROM BETA VERSION -->
+<div class="parsley-container evaluation backend" style="width: 678px;"> <ul style='width: 673px;'> <li style='width: 663px;'>Each grading scale needs to have the criteria value for each otpion (1, 2, 3, 4, 5)</li></ul></div>
+<!-- TEMPORARY NOTIFICATION, REMOVE FROM BETA VERSION -->
+<form class="jotform-form" action="" method="post" data-ajax="false" name="CCC-program-evaluation" id="CCC-program-evaluation" accept-charset="utf-8">
+  <div class="program_eval" style="width:685px;">
+    <ul class="form-section">
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:0;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+              <h2>
+              Innovating, Optimizing, and Advancing<br>Antithrombotic Treatment in Atrial Fibrillation
+            </h2>
+             <h2>Program Evaluation:</h2>
+             <h3>
+             On a scale of 1 (poorly) to 5 (greatly) how effectively were each of the learning objectives met?<br>
+            </h3>
+            <h3>After attending this session, you will be able to:</h3>
+          </div>
+        </div>
+        <div class="parsley-container evaluation backend" style="display:none;width: 678px;"> </div>
+      </li>
+      <!--
+      <li class="form-line-custom" id="id_1matrix">
+        <div class="form-input-wider">
+          <div class="form-single-column">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none">
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_0">
+                1
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_1">
+                2
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_2">
+                3
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_3">
+                4
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_4">
+                5
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                Integrate recent data from randomized trials and national and international databases and registries on the real-world use, effectiveness and safety of oral anticoagulants in patients with AF
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_1" name="BMS_107_E_1" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_2" name="BMS_107_E_1" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_3" name="BMS_107_E_1" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_4" name="BMS_107_E_1" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_1_eval_5" name="BMS_107_E_1" value="Strongly Agree" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                Consider additional treatment scenarios such as AF with concomitant coronary artery disease, and recognize the role of various antithrombotic agents for stroke prevention in such settings
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_2_eval_1" name="BMS_107_E_2" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_2_eval_2" name="BMS_107_E_2" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_2_eval_3" name="BMS_107_E_2" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_2_eval_4" name="BMS_107_E_2" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_2_eval_5"  name="BMS_107_E_2" value="Strongly Agree" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                Individualize antithrombotic therapy and practice effective DOAC usage in patients with special considerations, whilst balancing risk of bleeding with the benefit of stroke prevention
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_1" name="BMS_107_E_3" value="Strongly Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_2" name="BMS_107_E_3" value="Disagree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_3" name="BMS_107_E_3" value="Neutral" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_4" name="BMS_107_E_3" value="Agree" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio"  id="input_3_eval_5" name="BMS_107_E_3" value="Strongly Agree" />
+              </td>
+            </tr>
+          </table>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:0;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+             <h3>
+             On a scale of 1 to 5 (1 = low, 5 = high), please rate this program on the following criteria:
+            </h3>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="id_2matrix">
+        <div class="form-input-wider">
+          <div class="form-single-column">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none">
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_0">
+                1
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_1">
+                2
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_2">
+                3
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_3">
+                4
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_4">
+                5
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                Originality
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_1" name="BMS_107_E_4" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_2" name="BMS_107_E_4" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_3" name="BMS_107_E_4" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_4" name="BMS_107_E_4" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_5" name="BMS_107_E_4" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                Effectiveness
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_1" name="BMS_107_E_5" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_2" name="BMS_107_E_5" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_3" name="BMS_107_E_5" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_4" name="BMS_107_E_5" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_5" name="BMS_107_E_5" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                Interactivity (25%)
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_1" name="BMS_107_E_6" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_2" name="BMS_107_E_6" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_3" name="BMS_107_E_6" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_4" name="BMS_107_E_6" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_5" name="BMS_107_E_6" value="To a great extent" />
+              </td>
+            </tr>
+          </table>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:0;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+             <h3>
+             Please rank the following statements regarding each presentation using a scale from 1 (disagree) to 5 (agree):
+            </h3>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:0;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+             <h3>
+             Introduction and Chairing of Symposium – Dr. Laurent Macle
+            </h3>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="id_3matrix">
+        <div class="form-input-wider">
+          <div class="form-single-column">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none">
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_0">
+                1
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_1">
+                2
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_2">
+                3
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_3">
+                4
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_4">
+                5
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The chair fulfilled his role
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_1" name="BMS_107_E_7" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_2" name="BMS_107_E_7" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_3" name="BMS_107_E_7" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_4" name="BMS_107_E_7" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_5" name="BMS_107_E_7" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The topic of the symposium was well introduced
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_1" name="BMS_107_E_8" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_2" name="BMS_107_E_8" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_3" name="BMS_107_E_8" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_4" name="BMS_107_E_8" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_5" name="BMS_107_E_8" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The chair facilitated the discussion in an interactive manner
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_1" name="BMS_107_E_9" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_2" name="BMS_107_E_9" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_3" name="BMS_107_E_9" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_4" name="BMS_107_E_9" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_5" name="BMS_107_E_9" value="To a great extent" />
+              </td>
+            </tr>
+          </table>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:0;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+             <h3>
+             Real-world Evidence for Oral Anticoagulation – Professor Gregory Lip
+            </h3>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="id_4matrix">
+        <div class="form-input-wider">
+          <div class="form-single-column">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none">
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_0">
+                1
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_1">
+                2
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_2">
+                3
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_3">
+                4
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_4">
+                5
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The content was well delivered
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_1" name="BMS_107_E_10" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_2" name="BMS_107_E_10" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_3" name="BMS_107_E_10" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_4" name="BMS_107_E_10" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_5" name="BMS_107_E_10" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The information was relevant to my current practice
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_1" name="BMS_107_E_11" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_2" name="BMS_107_E_11" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_3" name="BMS_107_E_11" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_4" name="BMS_107_E_11" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_5" name="BMS_107_E_11" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                I acquired new knowledge
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_1" name="BMS_107_E_12" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_2" name="BMS_107_E_12" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_3" name="BMS_107_E_12" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_4" name="BMS_107_E_12" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_5" name="BMS_107_E_12" value="To a great extent" />
+              </td>
+            </tr>
+          </table>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:0;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+             <h3>
+              Stroke Prevention in Atrial Fibrillation Patients with CAD/ACS/PCI – Dr. L. Brent Mitchell
+            </h3>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="id_5matrix">
+        <div class="form-input-wider">
+          <div class="form-single-column">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none">
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_0">
+                1
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_1">
+                2
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_2">
+                3
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_3">
+                4
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_4">
+                5
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The content was well delivered
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_1" name="BMS_107_E_13" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_2" name="BMS_107_E_13" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_3" name="BMS_107_E_13" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_4" name="BMS_107_E_13" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_5" name="BMS_107_E_13" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The information was relevant to my current practice
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_1" name="BMS_107_E_14" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_2" name="BMS_107_E_14" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_3" name="BMS_107_E_14" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_4" name="BMS_107_E_14" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_5" name="BMS_107_E_14" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                I acquired new knowledge
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_1" name="BMS_107_E_15" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_2" name="BMS_107_E_15" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_3" name="BMS_107_E_15" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_4" name="BMS_107_E_15" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_5" name="BMS_107_E_15" value="To a great extent" />
+              </td>
+            </tr>
+          </table>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom"  style="margin:0;padding-top:0;padding-bottom:0;">
+        <div  style="margin:0;">
+          <div class="form-html" style="padding:0;">
+             <h3>
+              Complex Case for Stroke Prevention in AF – Dr. Paul Dorian
+            </h3>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="id_6matrix">
+        <div class="form-input-wider">
+          <div class="form-single-column">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none">
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_0">
+                1
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_1">
+                2
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_2">
+                3
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_3">
+                4
+              </th>
+              <th class="form-matrix-column-headers form-matrix-column_4">
+                5
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The content was well delivered
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_1" name="BMS_107_E_16" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_2" name="BMS_107_E_16" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_3" name="BMS_107_E_16" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_4" name="BMS_107_E_16" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_4_eval_5" name="BMS_107_E_16" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                The information was relevant to my current practice
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_1" name="BMS_107_E_17" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_2" name="BMS_107_E_17" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_3" name="BMS_107_E_17" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_4" name="BMS_107_E_17" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_5_eval_5" name="BMS_107_E_17" value="To a great extent" />
+              </td>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers wide">
+                I acquired new knowledge
+              </th>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_1" name="BMS_107_E_18" value="Not at all" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_2" name="BMS_107_E_18" value="Very little" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_3" name="BMS_107_E_18" value="Somewhat" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_4" name="BMS_107_E_18" value="Very" />
+              </td>
+              <td align="center" class="form-matrix-values">
+                <input class="form-radio" type="radio" id="input_6_eval_5" name="BMS_107_E_18" value="To a great extent" />
+              </td>
+            </tr>
+          </table>
+          </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_1">
+        <label class="form-label-top eval_label" style="width:655px;" for="eval_q_1"> Please indicate one or two changes that you will be able to apply to your practice? Please explain:</label>
+        <div id="cid_1_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_1" class="form-textarea" parsley-required="true" parsley-error-message="Please type an answer (maximum number of characters allowed: 500)" parsley-maxlength="500"  name="BMS_107_E_19" rows="3"></textarea>
+                 <div class="eval_q_1 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_2">
+        <label class="form-label-top eval_label" style="width:655px;" for="eval_q_2"> What future topics would support you in your practice? Please explain:</label>
+        <div id="cid_2_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_2" class="form-textarea" parsley-required="true" parsley-error-message="Please type an answer (maximum number of characters allowed: 500)" parsley-maxlength="500"  name="BMS_107_E_20" rows="3"></textarea>
+                 <div class="eval_q_2 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_3" style="padding-top:35px;">
+        <div id="cid_3_Evaluation" class="form-input-wide">
+          <table summary="" cellpadding="4" cellspacing="0" class="form-matrix-table-wide">
+            <tr>
+              <th style="border:none" >
+                &nbsp;
+              </th>
+              <th class="form-matrix-column-headers title-row">
+               Yes
+              </th>
+              <th class="form-matrix-column-headers title-row">
+                No
+              </th>
+            </tr>
+            <tr>
+              <th align="left" class="form-matrix-row-headers">
+                7. Did you perceive any degree of bias in any part of the presentations?
+              </th>
+              <td align="center" class="form-matrix-values pretest-col">
+                <input class="form-checkbox" type="checkbox" name="BMS_107_E_21" id="bias_yes" value="yes" />
+              </td>
+              <td align="center" class="form-matrix-values pretest-col">
+                <input class="form-checkbox" type="checkbox" name="BMS_107_E_21" id="bias_no" value="no" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_4">
+        <label class="form-label-top eval_label" for="eval_q_3"> If so, please explain: </label>
+        <div id="cid_4_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_3" class="form-textarea" parsley-error-message="Maximum number of characters allowed: 500" parsley-maxlength="500" name="bias" rows="3" ></textarea>
+                <div class="eval_q_3 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>
+      <li class="form-line-custom" id="program_q_5">
+        <label class="form-label-top eval_label" style="width:655px;" for="eval_q_4"> Comments: </label>
+        <div id="cid_5_Evaluation" class="form-input-wider">
+                <textarea id="eval_q_4" class="form-textarea" parsley-required="true" parsley-error-message="Please type an answer (maximum number of characters allowed: 500)" parsley-maxlength="500"  name="BMS_107_E_22" rows="3"></textarea>
+                 <div class="eval_q_4 form-textarea-limit-indicator evaluation">Max number of characters 500 </div>
+        </div>
+      </li>            
+      <li id="eval_actions">
+        <div id="cid_eval_actions" >
+          <div style="padding:0 10px 0 10px;" class="form-buttons-wrapper">
+            <button id="submit_evaluation" type="submit" class="big-form-button">Submit</button>
+            <button id="reset_eval_form" type="reset" class="form-submit-reset big-form-button">Clear Form</button>
+          </div>
+        </div>
+      </li>
+    -->
+    </ul>
+  </div>
+</form>
+<?php }//Close else tag ?>
+</td>
+  </tr>
+</table>
