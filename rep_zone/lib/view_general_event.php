@@ -302,7 +302,7 @@ class ViewEvent
               return true;
             } 
             else {
-              $message = "Cet événement n'existe pas. Cliquez sur l'onglet 'Mes événements' pour afficher vos événements ou créez un nouvel événement.";
+              $message = "This event does not exist. Click on the tab My Events to display your events or create a new event.";
               $this->setErrorMessage($message);
               return false;
             }

@@ -142,7 +142,7 @@ class Register
         $validator->addValidation("eventTime","req","Please fill in the event time *");
         $validator->addValidation("eventLocation","req","Please fill in the event location *");
         $validator->addValidation("attendees","req","Please fill in the attendees *");
-        $validator->addValidation("attendees","num");
+        $validator->addValidation("attendees","num","Please type a number *");
         $validator->addValidation("attendees","gt=0", "The attendes should be greater than 0 *");
         $validator->addValidation("arrrival_time","req","Please fill in the arrivals and meal time *");
         //added for program start time:
