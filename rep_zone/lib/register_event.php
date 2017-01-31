@@ -400,7 +400,7 @@ class Register
 
         $message = Swift_Message::newInstance('dxLink Repzone - New Group Learning Session')
         ->setFrom(array('dxLink@sta.ca' => 'dxLink'))
-        ->setTo(array('AmandaB@sta.ca' => 'Amanda Bell','ivang@sta.ca' => 'Ivan','DeannaC@sta.ca' => 'Deanna'))
+        ->setTo(array('AmandaB@sta.ca' => 'Amanda Bell','ivang@sta.ca' => 'Ivan','JillianL@sta.ca' => 'Jillian Lapointe','jamesk@sta.ca' => 'James'))
         ->setBody($body, 'text/html')
         ;
 
