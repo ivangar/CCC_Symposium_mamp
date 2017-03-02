@@ -51,6 +51,7 @@ require_once("../lib/view_event.php");
     var moderatorId = <?php $moderatorVal = $myevent->PrintModeratorId(); if(!empty($moderatorVal)) {echo "{$myevent->PrintModeratorId()}";} else echo "null"; ?>;
     var addressId = <?php $addressVal = $myevent->PrintAddressId(); if(!empty($addressVal)) {echo "{$myevent->PrintAddressId()}";} else echo "null"; ?>;
     var folderId = <?php $folderVal = $myevent->PrintFolderId(); if(!empty($folderVal)) {echo "'{$myevent->PrintFolderId()}'";} else echo "null"; ?>;
+    var moderatorName = <?php $moderatorName = $myevent->PrintModeratorName(); if(!empty($moderatorName)) {echo "'{$myevent->PrintModeratorName()}'";} else echo "null"; ?>;
     var upload_notification = "<div class='row'><div class='col-lg-12'><div class='alert alert-danger fade in' role='alert' ><p>Please fill in the information above before uploading the forms.</p></div></div></div>";
     var upload_table = "<div class='table-responsive table-bordered'><table class='table' style='margin-bottom:0;'><tbody><tr><td><div class='text-center'>CCS Conflict of Interest Form</div></td><td><div id='COI'>Upload</div></td></tr><tr><td><div class='text-center'>CCS Honorarium Form</div></td><td><div id='honorarium'>Upload</div></td></tr><tr><td><div class='text-center'>Sign In Sheet</div></td><td><div id='signin'>Upload</div></td></tr><tr><td><div class='text-center'>Evaluation Form</div></td><td><div id='evaluation'>Upload</div></td></tr></tbody></table></div>";
     </script>

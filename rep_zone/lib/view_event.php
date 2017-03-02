@@ -332,6 +332,10 @@ class ViewEvent
         $this->folderID = $newDir;
     }
 
+
+    public function PrintModeratorName(){
+      return $this->event_info[7];
+    }
         /**
      * Saves the new directory field in the events and moderators tables respectively
      */
