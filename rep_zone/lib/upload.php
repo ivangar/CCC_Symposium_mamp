@@ -80,26 +80,24 @@ class UploadFile {
         if(!$this->checkFileExists()){
             $return = $this->upload();
             echo json_encode($return);
-            $modName = $_GET['moderatorName'];
-            $date = date("F j, Y, g:i a");  
-            $thisEventId = strtok($_GET['folderID'], '_');
-            $thisModId = substr($_GET['folderID'], strpos($_GET['folderID'], "_") + 1);
-            $body = "<h3>A new file has been uploaded to RepZone: </h3><h4>Moderator: {$modName} </h4><h4>Type: {$this->sub_dir}</h4><h4>Event ID: {$thisEventId}</h4><h4>Moderator ID: {$thisModId}</h4><h4>Path: {$this->static_dirPath}</h4><h4>Submitted on: $date</h4><h4>To view the event details, please login as the administrator with the following credentials:<br>site: <a href='https://dxlink.ca/programs/CCC_Symposium/rep_zone/login.html'>https://dxlink.ca/programs/CCC_Symposium/rep_zone/login.html</a><br>user: admin@sta.ca<br>password: sta_repzone</h4>";
-            $transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -t -i');
+            if($_GET['update']){
+                $modName = $_GET['moderatorName'];
+                $date = date("F j, Y, g:i a");  
+                $thisEventId = strtok($_GET['folderID'], '_');
+                $thisModId = substr($_GET['folderID'], strpos($_GET['folderID'], "_") + 1);
+                $body = "<h3>A new file has been uploaded to RepZone: </h3><h4>Moderator: {$modName} </h4><h4>Type: {$this->sub_dir}</h4><h4>Event ID: {$thisEventId}</h4><h4>Moderator ID: {$thisModId}</h4><h4>Path: {$this->static_dirPath}</h4><h4>Submitted on: $date</h4><h4>To view the event details, please login as the administrator with the following credentials:<br>site: <a href='https://dxlink.ca/programs/CCC_Symposium/rep_zone/login.html'>https://dxlink.ca/programs/CCC_Symposium/rep_zone/login.html</a><br>user: admin@sta.ca<br>password: sta_repzone</h4>";
+                $transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -t -i');
 
-            $mailer = Swift_Mailer::newInstance($transport);
+                $mailer = Swift_Mailer::newInstance($transport);
 
-            $message = Swift_Message::newInstance('New File Uploaded to Repzone')
-            ->setFrom(array('dxLink@sta.ca' => 'dxLink'))
-            ->setTo(array('jamesk@sta.ca' => 'James'))
-            ->setBody($body, 'text/html');
+                $message = Swift_Message::newInstance('New File Uploaded to Repzone')
+                ->setFrom(array('dxLink@sta.ca' => 'dxLink'))
+                ->setTo(array('jamesk@sta.ca' => 'James', 'amandab@sta.ca' => 'Amanda'))
+                ->setBody($body, 'text/html');
 
-            $result = $mailer->send($message);
+                $result = $mailer->send($message);
             
-            // if(!$result)
-            // { return false; }
-            
-            // return true; 
+            } 
         }
 
         else{ echo json_encode($this->error_message); }
